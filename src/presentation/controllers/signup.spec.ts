@@ -1,13 +1,30 @@
 import { SignupController } from './signup'
 import { MissingParamError } from '@/presentation/errors/missing-param-error'
+import { InvalidParamError } from '@/presentation/errors/invalid-param-error'
+import { EmailValidator } from '@/presentation/protocols/email-validator'
 
-const makeSut = (): SignupController => {
-  return new SignupController()
+interface SutTypes {
+  sut: SignupController
+  emailValidatorSpy: EmailValidator
+}
+
+const makeSut = (): SutTypes => {
+  class EmailValidatorSpy implements EmailValidator {
+    isValid (email: string): boolean {
+      return true
+    }
+  }
+  const emailValidatorSpy = new EmailValidatorSpy()
+  const sut = new SignupController(emailValidatorSpy)
+  return {
+    sut,
+    emailValidatorSpy
+  }
 }
 
 describe('SignupController', () => {
   test('Should return 400 if no name is provided', () => {
-    const sut = makeSut()
+    const { sut } = makeSut()
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -21,7 +38,7 @@ describe('SignupController', () => {
   })
 
   test('Should return 400 if no email is provided', () => {
-    const sut = makeSut()
+    const { sut } = makeSut()
     const httpRequest = {
       body: {
         name: 'any_name',
@@ -35,7 +52,7 @@ describe('SignupController', () => {
   })
 
   test('Should return 400 if no password is provided', () => {
-    const sut = makeSut()
+    const { sut } = makeSut()
     const httpRequest = {
       body: {
         name: 'any_name',
@@ -49,7 +66,7 @@ describe('SignupController', () => {
   })
 
   test('Should return 400 if no passwordConfirmation is provided', () => {
-    const sut = makeSut()
+    const { sut } = makeSut()
     const httpRequest = {
       body: {
         name: 'any_name',
@@ -60,5 +77,21 @@ describe('SignupController', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('passwordConfirmation'))
+  })
+
+  test('Should return 400 if an invalid emai is provided', () => {
+    const { sut, emailValidatorSpy } = makeSut()
+    jest.spyOn(emailValidatorSpy, 'isValid').mockReturnValueOnce(false)
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'invalid_email@mail.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
 })
