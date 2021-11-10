@@ -1,7 +1,8 @@
-import { SignupController } from './signup'
+import { SignupController } from '@/presentation/controllers/signup'
 import { MissingParamError } from '@/presentation/errors/missing-param-error'
 import { InvalidParamError } from '@/presentation/errors/invalid-param-error'
 import { EmailValidator } from '@/presentation/protocols/email-validator'
+import faker from 'faker'
 
 interface SutTypes {
   sut: SignupController
@@ -25,11 +26,12 @@ const makeSut = (): SutTypes => {
 describe('SignupController', () => {
   test('Should return 400 if no name is provided', () => {
     const { sut } = makeSut()
+    const password = faker.internet.password()
     const httpRequest = {
       body: {
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
+        email: faker.internet.email(),
+        password: password,
+        passwordConfirmation: password
       }
     }
     const httpResponse = sut.handle(httpRequest)
@@ -39,11 +41,12 @@ describe('SignupController', () => {
 
   test('Should return 400 if no email is provided', () => {
     const { sut } = makeSut()
+    const password = faker.internet.password()
     const httpRequest = {
       body: {
-        name: 'any_name',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
+        name: faker.name.findName(),
+        password: password,
+        passwordConfirmation: password
       }
     }
     const httpResponse = sut.handle(httpRequest)
@@ -55,9 +58,9 @@ describe('SignupController', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        passwordConfirmation: 'any_password'
+        name: faker.name.findName(),
+        email: faker.internet.email(),
+        passwordConfirmation: faker.internet.password()
       }
     }
     const httpResponse = sut.handle(httpRequest)
@@ -81,13 +84,15 @@ describe('SignupController', () => {
 
   test('Should return 400 if an invalid emai is provided', () => {
     const { sut, emailValidatorSpy } = makeSut()
+    const password = faker.internet.password()
+
     jest.spyOn(emailValidatorSpy, 'isValid').mockReturnValueOnce(false)
     const httpRequest = {
       body: {
-        name: 'any_name',
-        email: 'invalid_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
+        name: faker.name.findName(),
+        email: faker.internet.email(),
+        password: password,
+        passwordConfirmation: password
       }
     }
     const httpResponse = sut.handle(httpRequest)
@@ -98,15 +103,17 @@ describe('SignupController', () => {
   test('Should call EmailValidator with correct email', () => {
     const { sut, emailValidatorSpy } = makeSut()
     const isValidSpy = jest.spyOn(emailValidatorSpy, 'isValid')
+    const password = faker.internet.password()
+    const email = faker.internet.email()
     const httpRequest = {
       body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
+        name: faker.name.findName(),
+        email: email,
+        password: password,
+        passwordConfirmation: password
       }
     }
     sut.handle(httpRequest)
-    expect(isValidSpy).toHaveBeenCalledWith('any_email@mail.com')
+    expect(isValidSpy).toHaveBeenCalledWith(email)
   })
 })
