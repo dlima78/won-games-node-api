@@ -1,8 +1,15 @@
-import { AccountModel } from '@/domain/models/account'
-import { AddAccount, AddAccountModel } from '@/domain/usecases/add-account'
-import { SignupController } from '@/presentation/controllers/signup'
-import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
-import { EmailValidator } from '@/presentation/protocols'
+import {
+  EmailValidator,
+  AddAccount,
+  AddAccountModel,
+  AccountModel
+} from '@/presentation/controllers/signup/signup-protocols'
+import {
+  MissingParamError,
+  InvalidParamError,
+  ServerError
+} from '@/presentation/errors'
+import { SignupController } from '@/presentation/controllers/signup/signup'
 import faker from 'faker'
 
 const makeEmailValidator = (): EmailValidator => {
