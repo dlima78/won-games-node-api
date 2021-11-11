@@ -1,7 +1,5 @@
 import { SignupController } from '@/presentation/controllers/signup'
-import { MissingParamError } from '@/presentation/errors/missing-param-error'
-import { InvalidParamError } from '@/presentation/errors/invalid-param-error'
-import { ServerError } from '@/presentation/errors/server-error'
+import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
 import { EmailValidator } from '@/presentation/protocols/email-validator'
 import faker from 'faker'
 
