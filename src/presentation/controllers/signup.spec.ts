@@ -1,6 +1,6 @@
 import { SignupController } from '@/presentation/controllers/signup'
 import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
-import { EmailValidator } from '@/presentation/protocols/email-validator'
+import { EmailValidator } from '@/presentation/protocols'
 import faker from 'faker'
 
 interface SutTypes {
