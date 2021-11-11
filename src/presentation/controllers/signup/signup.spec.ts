@@ -25,10 +25,10 @@ const makeAddAccount = (): AddAccount => {
   class AddAccountSpy implements AddAccount {
     add (account: AddAccountModel): AccountModel {
       const fakeAccount = {
-        id: faker.datatype.uuid(),
-        name: faker.name.firstName(),
-        email: faker.internet.email(),
-        password: faker.internet.password()
+        id: 'valid_id',
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
       }
       return fakeAccount
     }
@@ -127,7 +127,7 @@ describe('SignupController', () => {
     expect(httpResponse.body).toEqual(new InvalidParamError('passwordConfirmation'))
   })
 
-  test('Should return 400 if an invalid emai is provided', () => {
+  test('Should return 400 if an invalid email is provided', () => {
     const { sut, emailValidatorSpy } = makeSut()
     const password = faker.internet.password()
 
@@ -217,5 +217,25 @@ describe('SignupController', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 200 if valid data is provided', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+        passwordConfirmation: 'valid_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      id: 'valid_id',
+      name: 'valid_name',
+      email: 'valid_email@mail.com',
+      password: 'valid_password'
+    })
   })
 })
