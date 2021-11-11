@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests --watch",
+    "test": "jest --no-cache --passWithNoTests --watch",
     "prepare": "husky install",
-    "test:staged": "jest --passWithNoTests"
+    "test:staged": "jest --passWithNoTests --no-cache"
   },
   "keywords": [],
   "author": "",
