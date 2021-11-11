@@ -8,13 +8,26 @@ interface SutTypes {
   emailValidatorSpy: EmailValidator
 }
 
-const makeSut = (): SutTypes => {
+const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorSpy implements EmailValidator {
     isValid (email: string): boolean {
       return true
     }
   }
-  const emailValidatorSpy = new EmailValidatorSpy()
+  return new EmailValidatorSpy()
+}
+
+const makeEmailValidatorWithError = (): EmailValidator => {
+  class EmailValidatorSpy implements EmailValidator {
+    isValid (email: string): boolean {
+      throw new Error()
+    }
+  }
+  return new EmailValidatorSpy()
+}
+
+const makeSut = (): SutTypes => {
+  const emailValidatorSpy = makeEmailValidator()
   const sut = new SignupController(emailValidatorSpy)
   return {
     sut,
@@ -117,12 +130,7 @@ describe('SignupController', () => {
   })
 
   test('Should return 500 if EmailValidator throws', () => {
-    class EmailValidatorSpy implements EmailValidator {
-      isValid (email: string): boolean {
-        throw new Error()
-      }
-    }
-    const emailValidatorSpy = new EmailValidatorSpy()
+    const emailValidatorSpy = makeEmailValidatorWithError()
     const sut = new SignupController(emailValidatorSpy)
     const password = faker.internet.password()
     const httpRequest = {
