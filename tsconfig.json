@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "strict": true,
+    "rootDirs": ["src", "tests"],
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]

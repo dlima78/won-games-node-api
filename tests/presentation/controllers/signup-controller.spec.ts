@@ -1,16 +1,13 @@
-import {
-  EmailValidator,
-  AddAccount,
-  AddAccountModel,
-  AccountModel
-} from '@/presentation/controllers/signup/signup-protocols'
+import { EmailValidator } from '@/presentation/protocols'
 import {
   MissingParamError,
   InvalidParamError,
   ServerError
 } from '@/presentation/errors'
-import { SignupController } from '@/presentation/controllers/signup/signup'
+import { SignupController } from '@/presentation/controllers'
 import faker from 'faker'
+import { AddAccount, AddAccountModel } from '@/domain/usecases/add-account'
+import { AccountModel } from '@/domain/models/account'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorSpy implements EmailValidator {
