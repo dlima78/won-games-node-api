@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { MongoHelper, AccountMongoRepository } from '@/infra/db'
+import { MongoHelper, AccountMongoRepository } from '@/infra/db/mongodb'
 
 const makeSut = (): AccountMongoRepository => {
   return new AccountMongoRepository()
