@@ -6,12 +6,13 @@ describe('SignUp Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL as string)
   })
+
   afterAll(async () => {
     await MongoHelper.disconnect()
   })
 
   beforeEach(async () => {
-    const accountCollection = MongoHelper.getCollection('accounts')
+    const accountCollection = await MongoHelper.getCollection('accounts')
     await accountCollection.deleteMany({})
   })
 
@@ -19,10 +20,10 @@ describe('SignUp Routes', () => {
     await request(app)
       .post('/api/signup')
       .send({
-        name: 'Eduardo',
-        email: 'teste@test.com',
-        password: '123456',
-        passwordConfirmation: '123456'
+        name: 'Rodrigo',
+        email: 'rodrigo.manguinho@gmail.com',
+        password: '123',
+        passwordConfirmation: '123'
       })
       .expect(200)
   })

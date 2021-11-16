@@ -4,7 +4,7 @@ import {
   InvalidParamError,
   ServerError
 } from '@/presentation/errors'
-import { SignupController } from '@/presentation/controllers'
+import { SignUpController } from '@/presentation/controllers'
 import faker from 'faker'
 import { AddAccount, AddAccountModel } from '@/domain/usecases/add-account'
 import { AccountModel } from '@/domain/models/account'
@@ -34,7 +34,7 @@ const makeAddAccount = (): AddAccount => {
 }
 
 interface SutTypes {
-  sut: SignupController
+  sut: SignUpController
   emailValidatorSpy: EmailValidator
   addAccountSpy: AddAccount
 }
@@ -42,7 +42,7 @@ interface SutTypes {
 const makeSut = (): SutTypes => {
   const addAccountSpy = makeAddAccount()
   const emailValidatorSpy = makeEmailValidator()
-  const sut = new SignupController(emailValidatorSpy, addAccountSpy)
+  const sut = new SignUpController(emailValidatorSpy, addAccountSpy)
   return {
     sut,
     emailValidatorSpy,
@@ -50,7 +50,7 @@ const makeSut = (): SutTypes => {
   }
 }
 
-describe('SignupController', () => {
+describe('SignUpController', () => {
   test('Should return 400 if no name is provided', async () => {
     const { sut } = makeSut()
     const password = faker.internet.password()

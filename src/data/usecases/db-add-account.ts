@@ -5,12 +5,12 @@ import { AddAccountModel } from '@/domain/usecases/add-account'
 export class DbAddAccount {
   constructor (
     private readonly encrypter: Encrypter,
-    private readonly addAccountRespository: AddAccountRepository
+    private readonly addAccountRepository: AddAccountRepository
   ) {}
 
   async add (accountData: AddAccountModel): Promise<AccountModel> {
     const hashedPassword = await this.encrypter.encrypt(accountData.password)
-    const account = await this.addAccountRespository.add({ ...accountData, password: hashedPassword })
+    const account = await this.addAccountRepository.add({ ...accountData, password: hashedPassword })
     return account
   }
 }
