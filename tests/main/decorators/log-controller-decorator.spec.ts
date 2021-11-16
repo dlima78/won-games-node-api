@@ -7,7 +7,9 @@ const makeControllerSpy = (): Controller => {
     async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
       return await Promise.resolve({
         statusCode: 200,
-        body: {}
+        body: {
+          name: 'Eduardo'
+        }
       })
     }
   }
@@ -44,5 +46,26 @@ describe('LogController Decorator', () => {
 
     await sut.handle(httpRequest)
     expect(handleSpy).toHaveBeenCalledWith(httpRequest)
+  })
+
+  test('Should return the same result of the controller', async () => {
+    const { sut } = makeSut()
+    const password = faker.internet.password()
+    const httpRequest = {
+      body: {
+        email: faker.internet.email(),
+        name: faker.name.firstName(),
+        password: password,
+        passwordConfirmation: password
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual({
+      statusCode: 200,
+      body: {
+        name: 'Eduardo'
+      }
+    })
   })
 })
