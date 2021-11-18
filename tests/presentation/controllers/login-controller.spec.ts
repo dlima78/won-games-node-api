@@ -1,4 +1,4 @@
-import { Authentication } from '@/domain/usecases'
+import { Authentication, AuthenticationModel } from '@/domain/usecases'
 import { LoginController } from '@/presentation/controllers'
 import { HttpRequest, Validation } from '@/presentation/protocols'
 import faker from 'faker'
@@ -28,7 +28,7 @@ const makeValidation = (): Validation => {
 
 const makeAuthentication = (): Authentication => {
   class AuthenticationSpy implements Authentication {
-    async auth (email: string, password: string): Promise<string> {
+    async auth (authentication: AuthenticationModel): Promise<string> {
       return await Promise.resolve('any_token')
     }
   }
@@ -58,7 +58,10 @@ describe('Login Controller', () => {
     const isAuth = jest.spyOn(authenticationSpy, 'auth')
     const httpRequest = makeFakeRequest()
     await sut.handle(httpRequest)
-    expect(isAuth).toHaveBeenCalledWith(httpRequest.body.email, httpRequest.body.password)
+    expect(isAuth).toHaveBeenCalledWith({
+      email: httpRequest.body.email,
+      password: httpRequest.body.password
+    })
   })
 
   test('Should return 401 if invalid credentials are provided', async () => {
