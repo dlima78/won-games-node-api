@@ -97,4 +97,11 @@ describe('Name of the group', () => {
 
     expect(compareSpy).toHaveBeenLastCalledWith(password, makeFakeAccount().password)
   })
+
+  test('Should throw if HashCompare throws', async () => {
+    const { sut, hashComparerSpy } = makeSut()
+    jest.spyOn(hashComparerSpy, 'compare').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.auth(makeFakeAcuthentication())
+    await expect(promise).rejects.toThrow()
+  })
 })
