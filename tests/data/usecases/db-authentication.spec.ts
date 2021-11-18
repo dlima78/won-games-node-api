@@ -2,10 +2,16 @@ import { DbAuthentication } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
 import faker from 'faker'
 import { LoadAccountByEmailRepository } from '@/data/protocols'
+import { AuthenticationModel } from '@/domain/usecases'
 
 const makeFakeAccount = (): AccountModel => ({
   id: 'any_id',
   name: faker.name.firstName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+})
+
+const makeFakeAcuthentication = (): AuthenticationModel => ({
   email: faker.internet.email(),
   password: faker.internet.password()
 })
@@ -45,5 +51,12 @@ describe('Name of the group', () => {
     })
 
     expect(loadSpy).toHaveBeenLastCalledWith(email)
+  })
+
+  test('Should throw if LoadAccountByEmailRepository throws', async () => {
+    const { sut, loadAccountByEmailRepositorySpy } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositorySpy, 'load').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.auth(makeFakeAcuthentication())
+    await expect(promise).rejects.toThrow()
   })
 })
