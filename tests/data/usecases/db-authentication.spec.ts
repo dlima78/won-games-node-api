@@ -104,4 +104,12 @@ describe('Name of the group', () => {
     const promise = sut.auth(makeFakeAcuthentication())
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return null if HashCompare returns false', async () => {
+    const { sut, hashComparerSpy } = makeSut()
+    jest.spyOn(hashComparerSpy, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)))
+    const accessToken = await sut.auth(makeFakeAcuthentication())
+
+    expect(accessToken).toBeNull()
+  })
 })
