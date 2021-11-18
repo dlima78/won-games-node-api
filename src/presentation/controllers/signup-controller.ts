@@ -20,7 +20,6 @@ export class SignUpController implements Controller {
         return badRequest(error)
       }
       const { password, email, name } = httpRequest.body
-
       const account = await this.addAccount.add({
         name,
         email,
