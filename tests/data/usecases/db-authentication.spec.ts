@@ -59,4 +59,16 @@ describe('Name of the group', () => {
     const promise = sut.auth(makeFakeAcuthentication())
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return null if LoadAccountByEmailRepository returns null', async () => {
+    const { sut, loadAccountByEmailRepositorySpy } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositorySpy, 'load').mockReturnValueOnce(null)
+    const email = faker.internet.email()
+    const accessToken = await sut.auth({
+      email: email,
+      password: faker.internet.password()
+    })
+
+    expect(accessToken).toBeNull()
+  })
 })
