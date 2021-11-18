@@ -3,16 +3,17 @@ import { AccountModel } from '@/domain/models/account'
 import faker from 'faker'
 import { LoadAccountByEmailRepository } from '@/data/protocols'
 
+const makeFakeAccount = (): AccountModel => ({
+  id: 'any_id',
+  name: faker.name.firstName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+})
+
 const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
     async load (email: string): Promise<AccountModel> {
-      const account: AccountModel = {
-        id: 'any_id',
-        name: faker.name.firstName(),
-        email: faker.internet.email(),
-        password: faker.internet.password()
-      }
-      return await Promise.resolve(account)
+      return await Promise.resolve(makeFakeAccount())
     }
   }
   return new LoadAccountByEmailRepositorySpy()
