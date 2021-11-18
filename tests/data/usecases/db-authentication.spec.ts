@@ -1,9 +1,8 @@
 import { DbAuthentication } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
 import faker from 'faker'
-import { LoadAccountByEmailRepository } from '@/data/protocols'
+import { LoadAccountByEmailRepository, HashComparer, TokenGenerator } from '@/data/protocols'
 import { AuthenticationModel } from '@/domain/usecases'
-import { HashComparer } from '@/data/protocols/cryptography'
 
 const makeFakeAccount = (): AccountModel => ({
   id: 'any_id',
@@ -11,6 +10,15 @@ const makeFakeAccount = (): AccountModel => ({
   email: 'any_email',
   password: 'hashed_password'
 })
+
+const makeFakeTokenGenerator = (): TokenGenerator => {
+  class TokenGeneratorSpy implements TokenGenerator {
+    async generate (id: string): Promise<string> {
+      return await Promise.resolve('any_token')
+    }
+  }
+  return new TokenGeneratorSpy()
+}
 
 const makeFakeAcuthentication = (): AuthenticationModel => ({
   email: faker.internet.email(),
@@ -40,17 +48,19 @@ type SutTypes = {
   sut: DbAuthentication
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepository
   hashComparerSpy: HashComparer
-
+  tokenGeneratorSpy: TokenGenerator
 }
 
 const makeSut = (): SutTypes => {
+  const tokenGeneratorSpy = makeFakeTokenGenerator()
   const hashComparerSpy = makeHashComparer()
   const loadAccountByEmailRepositorySpy = makeLoadAccountByEmailRepository()
-  const sut = new DbAuthentication(loadAccountByEmailRepositorySpy, hashComparerSpy)
+  const sut = new DbAuthentication(loadAccountByEmailRepositorySpy, hashComparerSpy, tokenGeneratorSpy)
   return {
     sut,
     loadAccountByEmailRepositorySpy,
-    hashComparerSpy
+    hashComparerSpy,
+    tokenGeneratorSpy
   }
 }
 
@@ -86,7 +96,7 @@ describe('Name of the group', () => {
     expect(accessToken).toBeNull()
   })
 
-  test('Should call HashCompare with correct password ', async () => {
+  test('Should call HashCompare with correct values ', async () => {
     const { sut, hashComparerSpy } = makeSut()
     const compareSpy = jest.spyOn(hashComparerSpy, 'compare')
     const password = faker.internet.password()
@@ -95,7 +105,7 @@ describe('Name of the group', () => {
       password: password
     })
 
-    expect(compareSpy).toHaveBeenLastCalledWith(password, makeFakeAccount().password)
+    expect(compareSpy).toHaveBeenCalledWith(password, makeFakeAccount().password)
   })
 
   test('Should throw if HashCompare throws', async () => {
@@ -111,5 +121,17 @@ describe('Name of the group', () => {
     const accessToken = await sut.auth(makeFakeAcuthentication())
 
     expect(accessToken).toBeNull()
+  })
+
+  test('Should call TokenGenerator with correct id', async () => {
+    const { sut, tokenGeneratorSpy } = makeSut()
+    const generateSpy = jest.spyOn(tokenGeneratorSpy, 'generate')
+    const password = faker.internet.password()
+    await sut.auth({
+      email: faker.internet.email(),
+      password: password
+    })
+
+    expect(generateSpy).toHaveBeenCalledWith('any_id')
   })
 })
