@@ -134,4 +134,11 @@ describe('Name of the group', () => {
 
     expect(generateSpy).toHaveBeenCalledWith('any_id')
   })
+
+  test('Should throw if TokenGenerator throws', async () => {
+    const { sut, tokenGeneratorSpy } = makeSut()
+    jest.spyOn(tokenGeneratorSpy, 'generate').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.auth(makeFakeAcuthentication())
+    await expect(promise).rejects.toThrow()
+  })
 })
