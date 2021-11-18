@@ -141,4 +141,15 @@ describe('Name of the group', () => {
     const promise = sut.auth(makeFakeAcuthentication())
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return token on success', async () => {
+    const { sut } = makeSut()
+    const password = faker.internet.password()
+    const accessToken = await sut.auth({
+      email: faker.internet.email(),
+      password: password
+    })
+
+    expect(accessToken).toBe('any_token')
+  })
 })
