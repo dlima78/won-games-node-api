@@ -13,7 +13,7 @@ const makeFakeAccount = (): AccountModel => ({
 
 const makeUpdateAccessTokenRepository = (): UpdateAccessTokenRepository => {
   class UpdateAccessTokenRepositorySpy implements UpdateAccessTokenRepository {
-    async update (id: string, token: string): Promise<void> {
+    async updateAccessToken (id: string, token: string): Promise<void> {
       return await Promise.resolve()
     }
   }
@@ -167,7 +167,7 @@ describe('Name of the group', () => {
 
   test('Should call UpdateAccessTokenRepository with correct values', async () => {
     const { sut, updateAccessTokenRepositorySpy } = makeSut()
-    const updateSpy = jest.spyOn(updateAccessTokenRepositorySpy, 'update')
+    const updateSpy = jest.spyOn(updateAccessTokenRepositorySpy, 'updateAccessToken')
     const password = faker.internet.password()
     await sut.auth({
       email: faker.internet.email(),
@@ -179,7 +179,7 @@ describe('Name of the group', () => {
 
   test('Should throw if UpdateAccessTokenRepository throws', async () => {
     const { sut, updateAccessTokenRepositorySpy } = makeSut()
-    jest.spyOn(updateAccessTokenRepositorySpy, 'update').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    jest.spyOn(updateAccessTokenRepositorySpy, 'updateAccessToken').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
     const promise = sut.auth(makeFakeAcuthentication())
     await expect(promise).rejects.toThrow()
   })
