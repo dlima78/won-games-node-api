@@ -61,8 +61,10 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --cache --fix",
-      "npm run test:staged"
+      "eslint --cache --fix"
     ]
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
