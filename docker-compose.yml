@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   mongo:
     container_name: mongo-container
@@ -11,12 +11,17 @@ services:
   api:
     container_name: api-container
     build: .
+    image: node:14
+    working_dir: /usr/src/wongames-node-api
     restart: always
-    image: wongames-node-api
-    command: npm start
+    command: bash -c "npm install --only=prod && npm run debug"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/wongames-node-api
     volumes:
-      - ./dist:/usr/src/wongames-node-api/dist
+      - ./dist/:/usr/src/wongames-node-api/dist/
+      - ./package.json:/usr/src/wongames-node-api/package.json
     ports:
       - "5050:5050"
+      - "9222:9222"
     links:
       - mongo
