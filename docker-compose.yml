@@ -10,7 +10,6 @@ services:
       - "27017:27017"
   api:
     container_name: api-container
-    build: .
     image: node:14
     working_dir: /usr/src/wongames-node-api
     restart: always
