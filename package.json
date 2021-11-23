@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node dist/main/server.js",
     "build": "rimraf dist && tsc",
-    "debug": "node --inspect=0.0.0.0:9222 --no-lazy dist/main/server.js",
-    "up": "npm run build && docker-compose up",
+    "debug": "npx nodemon -L --watch ./dist --inspect=0.0.0.0:9222 --no-lazy ./dist/main/server.js",
+    "up": "npm run build && docker-compose up -d",
     "down": "docker-compose down",
     "test": "jest --no-cache --passWithNoTests --silent --noStackTrace --runInBand",
     "test:verbose": "jest --no-cache --passWithNoTests --runInBand",
