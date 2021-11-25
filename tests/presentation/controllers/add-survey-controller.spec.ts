@@ -2,7 +2,7 @@ import { Controller, HttpRequest, Validation } from '@/presentation/protocols'
 import faker from 'faker'
 import { AddSurveyController } from '@/presentation/controllers'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http-helper'
-import { AddSurvey, AddSurveyModel } from '@/domain/models/add-survey'
+import { AddSurvey, AddSurveyModel } from '@/domain/usecases/add-survey'
 
 const mockRequest = (): HttpRequest => ({
   body: {
