@@ -5,6 +5,7 @@ import faker from 'faker'
 import { AddAccount, AddAccountModel } from '@/domain/usecases/add-account'
 import { AccountModel } from '@/domain/models/account'
 import { ok, badRequest, serverError } from '@/presentation/helpers/http-helper'
+import { Authentication, AuthenticationModel } from '@/domain/usecases'
 
 const makeFakeRequest = (): HttpRequest => {
   const password = faker.internet.password()
@@ -16,6 +17,15 @@ const makeFakeRequest = (): HttpRequest => {
       passwordConfirmation: password
     }
   }
+}
+
+const makeAuthentication = (): Authentication => {
+  class AuthenticationSpy implements Authentication {
+    async auth (authentication: AuthenticationModel): Promise<string> {
+      return await Promise.resolve('any_token')
+    }
+  }
+  return new AuthenticationSpy()
 }
 
 const makeValidation = (): Validation => {
@@ -47,16 +57,19 @@ interface SutTypes {
   sut: SignUpController
   addAccountSpy: AddAccount
   validationSpy: Validation
+  authenticationSpy: Authentication
 }
 
 const makeSut = (): SutTypes => {
+  const authenticationSpy = makeAuthentication()
   const validationSpy = makeValidation()
   const addAccountSpy = makeAddAccount()
-  const sut = new SignUpController(addAccountSpy, validationSpy)
+  const sut = new SignUpController(addAccountSpy, validationSpy, authenticationSpy)
   return {
     sut,
     addAccountSpy,
-    validationSpy
+    validationSpy,
+    authenticationSpy
   }
 }
 
@@ -108,5 +121,16 @@ describe('SignUpController', () => {
     jest.spyOn(validationSpy, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new MissingParamError('any_field')))
+  })
+
+  test('Should call Authentication with correct values', async () => {
+    const { sut, authenticationSpy } = makeSut()
+    const isAuth = jest.spyOn(authenticationSpy, 'auth')
+    const httpRequest = makeFakeRequest()
+    await sut.handle(httpRequest)
+    expect(isAuth).toHaveBeenCalledWith({
+      email: httpRequest.body.email,
+      password: httpRequest.body.password
+    })
   })
 })
