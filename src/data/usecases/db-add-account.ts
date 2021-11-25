@@ -1,8 +1,8 @@
 import { AddAccountRepository, Hasher } from '@/data/protocols'
 import { AccountModel } from '@/domain/models/account'
-import { AddAccountModel } from '@/domain/usecases/add-account'
+import { AddAccountModel, AddAccount } from '@/domain/usecases'
 
-export class DbAddAccount {
+export class DbAddAccount implements AddAccount {
   constructor (
     private readonly hasher: Hasher,
     private readonly addAccountRepository: AddAccountRepository

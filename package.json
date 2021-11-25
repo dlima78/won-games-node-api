@@ -57,12 +57,6 @@
     "mongodb": "^3.7.3",
     "validator": "^13.7.0"
   },
-  "lint-staged": {
-    "**/*.{ts}": [
-      "eslint --fix",
-      "npm run test:staged"
-    ]
-  },
   "_moduleAliases": {
     "@": "dist"
   },
