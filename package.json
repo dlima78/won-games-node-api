@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/main/server.js",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc -p tsconfig-build.json",
     "debug": "npx nodemon -L --watch ./dist --inspect=0.0.0.0:9222 --no-lazy ./dist/main/server.js",
     "up": "npm run build && docker-compose up -d",
     "down": "docker-compose down",
@@ -13,7 +13,7 @@
     "test:verbose": "jest --no-cache --passWithNoTests --runInBand",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
-    "test:staged": "npm test -- --findRelatedTests",
+    "test:staged": "npm test -- --findRelatedTests ",
     "test:ci": "npm test -- --coverage",
     "prepare": "husky install"
   },
@@ -59,11 +59,6 @@
   },
   "_moduleAliases": {
     "@": "dist"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint --cache --fix"
-    ]
   },
   "engines": {
     "node": "14.x"
