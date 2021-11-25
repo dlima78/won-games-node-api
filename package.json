@@ -13,7 +13,7 @@
     "test:verbose": "jest --no-cache --passWithNoTests --runInBand",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
-    "test:staged": "npm test -- --findRelatedTests ",
+    "test:staged": "npm test -- --findRelatedTests",
     "test:ci": "npm test -- --coverage",
     "prepare": "husky install"
   },
@@ -56,6 +56,12 @@
     "module-alias": "^2.2.2",
     "mongodb": "^3.7.3",
     "validator": "^13.7.0"
+  },
+  "lint-staged": {
+    "**/*.{ts}": [
+      "eslint --fix",
+      "npm run test:staged"
+    ]
   },
   "_moduleAliases": {
     "@": "dist"
