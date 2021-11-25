@@ -4,9 +4,10 @@ import {
   Controller,
   Validation
 } from '@/presentation/protocols'
-import { badRequest, ok, serverError } from '@/presentation/helpers/http-helper'
+import { badRequest, forbiden, ok, serverError } from '@/presentation/helpers/http-helper'
 import { AddAccount } from '@/domain/usecases/add-account'
 import { Authentication } from '@/domain/usecases'
+import { EmailInUseError } from '../errors'
 
 export class SignUpController implements Controller {
   constructor (
@@ -22,11 +23,14 @@ export class SignUpController implements Controller {
         return badRequest(error)
       }
       const { password, email, name } = httpRequest.body
-      await this.addAccount.add({
+      const account = await this.addAccount.add({
         name,
         email,
         password
       })
+      if (!account) {
+        return forbiden(new EmailInUseError())
+      }
       const accessToken = await this.authentication.auth({ email, password })
       return ok({ accessToken })
     } catch (error) {
