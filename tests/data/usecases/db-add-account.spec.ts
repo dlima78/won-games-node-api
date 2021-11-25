@@ -1,4 +1,4 @@
-import { AddAccountRepository, Hasher } from '@/data/protocols'
+import { AddAccountRepository, Hasher, LoadAccountByEmailRepository } from '@/data/protocols'
 import { DbAddAccount } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
 import { AddAccountModel } from '@/domain/usecases/add-account'
@@ -35,20 +35,32 @@ const makeHasher = (): Hasher => {
   return new HasherSpy()
 }
 
+const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
+  class LoadAccountByEmailrepositorySpy implements LoadAccountByEmailRepository {
+    async loadByEmail (email: string): Promise<AccountModel> {
+      return await Promise.resolve(makeFakeAccount())
+    }
+  }
+  return new LoadAccountByEmailrepositorySpy()
+}
+
 interface SutTypes {
   sut: DbAddAccount
   hasherSpy: Hasher
   addAccountRepositorySpy: AddAccountRepository
+  loadAccountByEmailRepositorySpy: LoadAccountByEmailRepository
 }
 
 const makeSut = (): SutTypes => {
   const addAccountRepositorySpy = makeAddAccountRespository()
   const hasherSpy = makeHasher()
-  const sut = new DbAddAccount(hasherSpy, addAccountRepositorySpy)
+  const loadAccountByEmailRepositorySpy = makeLoadAccountByEmailRepository()
+  const sut = new DbAddAccount(hasherSpy, addAccountRepositorySpy, loadAccountByEmailRepositorySpy)
   return {
     sut,
     hasherSpy,
-    addAccountRepositorySpy
+    addAccountRepositorySpy,
+    loadAccountByEmailRepositorySpy
   }
 }
 
@@ -97,5 +109,18 @@ describe('DbAddAccount Usecase', () => {
     const { sut } = makeSut()
     const account = await sut.add(makeFakeAccountData())
     expect(account).toEqual(makeFakeAccount())
+  })
+
+  test('Should call LoadAccountByEmailRepository with correct email ', async () => {
+    const { sut, loadAccountByEmailRepositorySpy } = makeSut()
+    const loadSpy = jest.spyOn(loadAccountByEmailRepositorySpy, 'loadByEmail')
+    const email = faker.internet.email()
+    await sut.add({
+      name: faker.name.firstName(),
+      email,
+      password: faker.internet.password()
+    })
+
+    expect(loadSpy).toHaveBeenLastCalledWith(email)
   })
 })
