@@ -1,5 +1,5 @@
 export type SurveyAnswer = {
-  image: string
+  image?: string
   answer: string
 }
 
