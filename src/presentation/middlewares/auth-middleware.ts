@@ -1,9 +1,10 @@
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols'
+import { HttpRequest, HttpResponse } from '@/presentation/protocols'
 import { AccessDeniedError } from '@/presentation/errors'
-import { forbiden, ok, serverError } from '@/presentation/helpers/http-helper'
+import { forbidden, ok, serverError } from '@/presentation/helpers/http-helper'
 import { LoadAccountByToken } from '@/domain/usecases/load-account-by-token'
+import { Middleware } from '../protocols/middleware'
 
-export class AuthMiddleware implements Controller {
+export class AuthMiddleware implements Middleware {
   constructor (
     private readonly loadAccountByToken: LoadAccountByToken,
     private readonly role?: string
@@ -18,7 +19,7 @@ export class AuthMiddleware implements Controller {
           return ok({ accountId: account.id })
         }
       }
-      return forbiden(new AccessDeniedError())
+      return forbidden(new AccessDeniedError())
     } catch (error) {
       return serverError(error)
     }

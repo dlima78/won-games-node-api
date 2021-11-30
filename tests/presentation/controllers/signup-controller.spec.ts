@@ -4,7 +4,7 @@ import { SignUpController } from '@/presentation/controllers'
 import faker from 'faker'
 import { AddAccount, AddAccountModel } from '@/domain/usecases/add-account'
 import { AccountModel } from '@/domain/models/account'
-import { ok, badRequest, serverError, forbiden } from '@/presentation/helpers/http-helper'
+import { ok, badRequest, serverError, forbidden } from '@/presentation/helpers/http-helper'
 import { Authentication, AuthenticationModel } from '@/domain/usecases'
 
 const makeFakeRequest = (): HttpRequest => {
@@ -106,7 +106,7 @@ describe('SignUpController', () => {
     const { sut, addAccountSpy } = makeSut()
     jest.spyOn(addAccountSpy, 'add').mockReturnValueOnce(new Promise(resolve => resolve(null)))
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(forbiden(new EmailInUseError()))
+    expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
   })
 
   test('Should return 200 if valid data is provided', async () => {
