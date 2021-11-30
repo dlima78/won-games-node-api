@@ -58,8 +58,7 @@ describe('Survey Routes', () => {
         }
       })
 
-      const account = await accountCollection.findOne({ _id: id })
-      console.log(account)
+      await accountCollection.findOne({ _id: id })
       await request(app)
         .post('/api/surveys')
         .set('x-access-token', accessToken)
