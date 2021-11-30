@@ -81,11 +81,11 @@ describe('DbLoadAccountByToken Usecase', () => {
     expect(account).toEqual(mockAccount())
   })
 
-  test('Should throw if Decrypter throws', async () => {
+  test('Should returns null if Decrypter throws', async () => {
     const { sut, decrypterSpy } = makeSut()
     jest.spyOn(decrypterSpy, 'decrypt').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
-    const promise = sut.load('any-token', 'any-role')
-    await expect(promise).rejects.toThrow()
+    const account = await sut.load('any-token', 'any-role')
+    expect(account).toBeNull()
   })
 
   test('Should throw if LoadAccountByTokenRepository throws', async () => {
