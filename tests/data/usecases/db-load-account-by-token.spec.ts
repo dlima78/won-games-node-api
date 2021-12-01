@@ -1,4 +1,4 @@
-import { LoadAccountByToken } from '@/domain/usecases/load-account-by-token'
+import { LoadAccountByToken } from '@/domain/usecases'
 import { Decrypter } from '@/data/protocols/cryptography'
 import { DbLoadAccountByToken } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
