@@ -33,7 +33,8 @@ describe('Survey Mongo Repository', () => {
         },
         {
           answer: faker.random.word()
-        }]
+        }],
+        date: new Date()
       })
       const count = await surveyCollection.countDocuments()
       expect(count).toBe(1)
