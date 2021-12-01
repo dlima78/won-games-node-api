@@ -1,5 +1,5 @@
 import { LoadSurveysController } from '@/presentation/controllers'
-import { ok } from '@/presentation/helpers/http-helper'
+import { ok, serverError } from '@/presentation/helpers/http-helper'
 import { LoadSurveys } from '@/domain/usecases'
 import { SurveyModel } from '@/domain/models'
 import MockDate from 'mockdate'
@@ -64,5 +64,12 @@ describe('LoadSurveys Controller', () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(ok(mockSurveys()))
+  })
+
+  test('Should return 500 if AddSurvey throws', async () => {
+    const { sut, loadSurveysSpy } = makeSut()
+    jest.spyOn(loadSurveysSpy, 'load').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const httpResponse = await sut.handle({})
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
 })
