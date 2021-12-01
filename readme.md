@@ -6,3 +6,4 @@
 1. [Cadastro](./requirements/signup.md)
 1. [Login](./requirements/login.md) 
 1. [Criar enquete](./requirements/add-survey.md)
+1. [Listar enquetes](./requirements/load-surveys.md)
