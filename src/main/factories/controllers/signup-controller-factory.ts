@@ -5,6 +5,6 @@ import { makeDbAddAccount, makeDbAuthentication } from '@/main/factories/usecase
 import { makeLogControllerDecorator } from '../decorator'
 
 export const makeSignUpController = (): Controller => {
-  const signupController = new SignUpController(makeDbAddAccount(), makeSignUpValidation(), makeDbAuthentication())
-  return makeLogControllerDecorator(signupController)
+  const controller = new SignUpController(makeDbAddAccount(), makeSignUpValidation(), makeDbAuthentication())
+  return makeLogControllerDecorator(controller)
 }
