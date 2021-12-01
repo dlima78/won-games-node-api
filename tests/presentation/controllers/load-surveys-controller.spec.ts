@@ -1,6 +1,7 @@
-import { SurveyModel } from '@/domain/models'
-import { LoadSurveys } from '@/domain/usecases'
 import { LoadSurveysController } from '@/presentation/controllers'
+import { ok } from '@/presentation/helpers/http-helper'
+import { LoadSurveys } from '@/domain/usecases'
+import { SurveyModel } from '@/domain/models'
 import MockDate from 'mockdate'
 
 const mockSurveys = (): SurveyModel[] => ([{
@@ -57,5 +58,11 @@ describe('LoadSurveys Controller', () => {
     const loadSpy = jest.spyOn(loadSurveysSpy, 'load')
     await sut.handle({})
     expect(loadSpy).toHaveBeenCalled()
+  })
+
+  test('Should return 200 on success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle({})
+    expect(httpResponse).toEqual(ok(mockSurveys()))
   })
 })
