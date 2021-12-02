@@ -44,7 +44,7 @@ const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   return new LoadAccountByEmailrepositorySpy()
 }
 
-interface SutTypes {
+type SutTypes = {
   sut: DbAddAccount
   hasherSpy: Hasher
   addAccountRepositorySpy: AddAccountRepository

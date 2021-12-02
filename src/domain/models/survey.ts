@@ -3,7 +3,7 @@ export type SurveyAnswerModel = {
   answer: string
 }
 
-export interface SurveyModel {
+export type SurveyModel = {
   id: string
   question: string
   answers: SurveyAnswerModel[]

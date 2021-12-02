@@ -48,7 +48,7 @@ const makeControllerSpy = (): Controller => {
   return new ControllerSpy()
 }
 
-interface SutTypes {
+type SutTypes = {
   sut: LogControllerDecorator
   controllerSpy: Controller
   logErrorRepositorySpy: LogErrorRepository
