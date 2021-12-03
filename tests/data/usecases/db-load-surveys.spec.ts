@@ -1,7 +1,6 @@
 import { LoadSurveysRepository } from '@/data/protocols/db'
 import { SurveyModel } from '@/domain/models'
 import { DbLoadSurveys } from '@/data/usecases'
-import { LoadSurveys } from '@/domain/usecases'
 import MockDate from 'mockdate'
 
 const mockSurveys = (): SurveyModel[] => ([{
@@ -32,7 +31,7 @@ const makeLoadSurveysRepository = (): LoadSurveysRepository => {
 }
 
 type SutTypes = {
-  sut: LoadSurveys
+  sut: DbLoadSurveys
   loadSurveysRepositorySpy: LoadSurveysRepository
 }
 
