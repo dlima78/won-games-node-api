@@ -12,6 +12,13 @@ const mockSurveyResult = (): SurveyResultModel => ({
   date: new Date()
 })
 
+const makeSurveyResultData = (): SaveSurveyResultModel => ({
+  surveyId: 'any_surveyId',
+  accountId: 'any_accountId',
+  answer: 'any_answer',
+  date: new Date()
+})
+
 const makeSaveSurveyResultRepository = (): SaveSurveyResultRepository => {
   class SaveSurveyRepositorySpy implements SaveSurveyResultRepository {
     async save (data: SaveSurveyResultModel): Promise<SurveyResultModel> {
@@ -47,7 +54,15 @@ describe('DbSaveSurveyResult', () => {
   test('Should call SaveSurveyRepository with correct valeus', async () => {
     const { sut, saveSurveyResultRepositorySpy } = makeSut()
     const saveSpy = jest.spyOn(saveSurveyResultRepositorySpy, 'save')
-    await sut.save(mockSurveyResult())
-    expect(saveSpy).toHaveBeenCalledWith(mockSurveyResult())
+    await sut.save(makeSurveyResultData())
+    expect(saveSpy).toHaveBeenCalledWith(makeSurveyResultData())
+  })
+
+  test('Should throw if SaveSurveyRepository throws', async () => {
+    const { sut, saveSurveyResultRepositorySpy } = makeSut()
+    jest.spyOn(saveSurveyResultRepositorySpy, 'save')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = sut.save(makeSurveyResultData())
+    await expect(promise).rejects.toThrow()
   })
 })
