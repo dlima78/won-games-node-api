@@ -12,7 +12,7 @@
 
 > ## Exceções
 
-1. ⛔ Retorna erro **404** se a API não existir
+1. ✅ Retorna erro **404** se a API não existir
 1. ⛔ Retorna erro **403** se o usuário não for o admin
 1. ✅ Retorna erro **403** se o survey_id passado na URL for inválido
 1. ✅ Retorna erro **403** se a resposta enviada pelo cliente for uma resposta inválida
