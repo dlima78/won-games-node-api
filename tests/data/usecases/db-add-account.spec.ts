@@ -1,7 +1,7 @@
 import { AddAccountRepository, Hasher, LoadAccountByEmailRepository } from '@/data/protocols'
 import { DbAddAccount } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
-import { AddAccountModel } from '@/domain/usecases/add-account'
+import { AddAccountParams } from '@/domain/usecases/add-account'
 import faker from 'faker'
 
 const makeFakeAccount = (): AccountModel => ({
@@ -11,7 +11,7 @@ const makeFakeAccount = (): AccountModel => ({
   password: 'valid_password'
 })
 
-const makeFakeAccountData = (): AddAccountModel => ({
+const makeFakeAccountData = (): AddAccountParams => ({
   name: faker.name.firstName(),
   email: faker.internet.email(),
   password: faker.internet.password()
@@ -19,7 +19,7 @@ const makeFakeAccountData = (): AddAccountModel => ({
 
 const makeAddAccountRespository = (): AddAccountRepository => {
   class AddAccountRepositorySpy implements AddAccountRepository {
-    async add (accountData: AddAccountModel): Promise<AccountModel> {
+    async add (accountData: AddAccountParams): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }

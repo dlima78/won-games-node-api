@@ -2,7 +2,7 @@ import { DbAuthentication } from '@/data/usecases'
 import { AccountModel } from '@/domain/models/account'
 import faker from 'faker'
 import { LoadAccountByEmailRepository, HashComparer, Encrypter, UpdateAccessTokenRepository } from '@/data/protocols'
-import { AuthenticationModel } from '@/domain/usecases'
+import { AuthenticationParams } from '@/domain/usecases'
 
 const makeFakeAccount = (): AccountModel => ({
   id: 'any_id',
@@ -29,7 +29,7 @@ const makeFakeEncrypter = (): Encrypter => {
   return new EncrypterSpy()
 }
 
-const makeFakeAcuthentication = (): AuthenticationModel => ({
+const makeFakeAcuthentication = (): AuthenticationParams => ({
   email: faker.internet.email(),
   password: faker.internet.password()
 })

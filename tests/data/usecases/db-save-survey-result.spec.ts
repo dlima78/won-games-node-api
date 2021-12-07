@@ -1,6 +1,6 @@
 import { SaveSurveyResultRepository } from '@/data/protocols'
 import { DbSaveSurveyResult } from '@/data/usecases'
-import { SaveSurveyResultModel } from '@/domain/usecases'
+import { SaveSurveyResultParams } from '@/domain/usecases'
 import { SurveyResultModel } from '@/domain/models'
 import MockDate from 'mockdate'
 
@@ -12,7 +12,7 @@ const mockSurveyResult = (): SurveyResultModel => ({
   date: new Date()
 })
 
-const makeSurveyResultData = (): SaveSurveyResultModel => ({
+const makeSurveyResultData = (): SaveSurveyResultParams => ({
   surveyId: 'any_surveyId',
   accountId: 'any_accountId',
   answer: 'any_answer',
@@ -21,7 +21,7 @@ const makeSurveyResultData = (): SaveSurveyResultModel => ({
 
 const makeSaveSurveyResultRepository = (): SaveSurveyResultRepository => {
   class SaveSurveyRepositorySpy implements SaveSurveyResultRepository {
-    async save (data: SaveSurveyResultModel): Promise<SurveyResultModel> {
+    async save (data: SaveSurveyResultParams): Promise<SurveyResultModel> {
       return await Promise.resolve(mockSurveyResult())
     }
   }

@@ -1,10 +1,10 @@
-import { AddSurveyModel } from '@/domain/usecases/add-survey'
+import { AddSurveyParams } from '@/domain/usecases/add-survey'
 import faker from 'faker'
 import { DbAddSurvey } from '@/data/usecases'
 import { AddSurveyRepository } from '../protocols/db/survey/add-survey-repository'
 import MockDate from 'mockdate'
 
-const makeSurveyData = (): AddSurveyModel => ({
+const makeSurveyData = (): AddSurveyParams => ({
   question: faker.random.words(),
   answers: [{
     image: faker.internet.url(),
@@ -19,7 +19,7 @@ const makeSurveyData = (): AddSurveyModel => ({
 
 const makeAddSurveyRepository = (): AddSurveyRepository => {
   class AddSurveyRepositorySpy implements AddSurveyRepository {
-    async add (data: AddSurveyModel): Promise<void> {
+    async add (data: AddSurveyParams): Promise<void> {
       return await Promise.resolve(null)
     }
   }

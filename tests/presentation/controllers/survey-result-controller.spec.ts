@@ -1,5 +1,5 @@
 import { SurveyModel, SurveyResultModel } from '@/domain/models'
-import { LoadSurveyById, SaveSurveyResult, SaveSurveyResultModel } from '@/domain/usecases'
+import { LoadSurveyById, SaveSurveyResult, SaveSurveyResultParams } from '@/domain/usecases'
 import { SaveSurveyResultController } from '@/presentation/controllers'
 import { HttpRequest } from '@/presentation/protocols'
 import { InvalidParamError } from '@/presentation/errors'
@@ -34,7 +34,7 @@ const mockSurveyResult = (): SurveyResultModel => ({
   date: new Date()
 })
 
-const mockSaveSurveyResult = (): SaveSurveyResultModel => ({
+const mockSaveSurveyResult = (): SaveSurveyResultParams => ({
   surveyId: 'any_survey_id',
   accountId: 'any_account_id',
   answer: 'any_answer',
@@ -43,7 +43,7 @@ const mockSaveSurveyResult = (): SaveSurveyResultModel => ({
 
 const makeSaveSurveyResult = (): SaveSurveyResult => {
   class SaveSurveyResultSpy implements SaveSurveyResult {
-    async save (data: SaveSurveyResultModel): Promise<SurveyResultModel> {
+    async save (data: SaveSurveyResultParams): Promise<SurveyResultModel> {
       return await Promise.resolve(mockSurveyResult())
     }
   }
