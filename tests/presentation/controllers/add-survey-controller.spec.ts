@@ -3,7 +3,9 @@ import faker from 'faker'
 import { AddSurveyController } from '@/presentation/controllers'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http-helper'
 import { AddSurvey, AddSurveyParams } from '@/domain/usecases/add-survey'
+import { throwError } from '@/tests/domain/mocks'
 import MockDate from 'mockdate'
+import { mockValidation } from '@/tests/presentation/mocks'
 
 const mockRequest = (): HttpRequest => ({
   body: {
@@ -16,15 +18,6 @@ const mockRequest = (): HttpRequest => ({
   }
 
 })
-
-const makeValidation = (): Validation => {
-  class ValidationSpy implements Validation {
-    validate (input: any): Error {
-      return null
-    }
-  }
-  return new ValidationSpy()
-}
 
 const makeAddSurvey = (): AddSurvey => {
   class AddSurveySpy implements AddSurvey {
@@ -41,7 +34,7 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const validationSpy = makeValidation()
+  const validationSpy = mockValidation()
   const addSurveySpy = makeAddSurvey()
   const sut = new AddSurveyController(validationSpy, addSurveySpy)
   return {
@@ -85,7 +78,7 @@ describe('AddSurvey Controller', () => {
 
   test('Should return 500 if AddSurvey throws', async () => {
     const { sut, addSurveySpy } = makeSut()
-    jest.spyOn(addSurveySpy, 'add').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    jest.spyOn(addSurveySpy, 'add').mockImplementationOnce(throwError)
     const httpResponse = await sut.handle(mockRequest())
     expect(httpResponse).toEqual(serverError(new Error()))
   })

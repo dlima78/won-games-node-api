@@ -1,4 +1,4 @@
-import { Authentication, AuthenticationParams } from '@/domain/usecases'
+import { Authentication } from '@/domain/usecases'
 import { LoginController } from '@/presentation/controllers'
 import { HttpRequest, Validation } from '@/presentation/protocols'
 import faker from 'faker'
@@ -9,6 +9,9 @@ import {
   serverError,
   unauthorized
 } from '@/presentation/helpers/http-helper'
+import { throwError } from '@/tests/domain/mocks'
+import { mockValidation } from '@/tests/presentation/mocks'
+import { mockAuthentication } from '../mocks/mock-account'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -17,24 +20,6 @@ const makeFakeRequest = (): HttpRequest => ({
   }
 })
 
-const makeValidation = (): Validation => {
-  class ValidationSpy implements Validation {
-    validate (input: any): Error {
-      return null
-    }
-  }
-  return new ValidationSpy()
-}
-
-const makeAuthentication = (): Authentication => {
-  class AuthenticationSpy implements Authentication {
-    async auth (authentication: AuthenticationParams): Promise<string> {
-      return await Promise.resolve('any_token')
-    }
-  }
-  return new AuthenticationSpy()
-}
-
 type SutTypes = {
   sut: LoginController
   authenticationSpy: Authentication
@@ -42,8 +27,8 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const validationSpy = makeValidation()
-  const authenticationSpy = makeAuthentication()
+  const validationSpy = mockValidation()
+  const authenticationSpy = mockAuthentication()
   const sut = new LoginController(authenticationSpy, validationSpy)
   return {
     sut,
@@ -74,7 +59,7 @@ describe('Login Controller', () => {
   test('Should return 500 if Authentication throws', async () => {
     const { sut, authenticationSpy } = makeSut()
     jest.spyOn(authenticationSpy, 'auth')
-      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+      .mockImplementationOnce(throwError)
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new ServerError(null)))
   })

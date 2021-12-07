@@ -1,26 +1,8 @@
-import { SurveyModel } from '@/domain/models'
 import { LoadSurveyByIdRepository } from '@/data/protocols'
-import MockDate from 'mockdate'
 import { DbLoadSurveyById } from '@/data/usecases'
-
-const mockSurvey = (): SurveyModel => ({
-  id: 'any_id',
-  question: 'any_question',
-  answers: [{
-    image: 'any_image',
-    answer: 'any_answer'
-  }],
-  date: new Date()
-})
-
-const makeLoadSurveyByIdRepository = (): LoadSurveyByIdRepository => {
-  class LoadSurveyByIdRepositorySpy implements LoadSurveyByIdRepository {
-    async loadById (id: string): Promise<SurveyModel> {
-      return await Promise.resolve(mockSurvey())
-    }
-  }
-  return new LoadSurveyByIdRepositorySpy()
-}
+import { mockSurvey, throwError } from '@/tests/domain/mocks'
+import MockDate from 'mockdate'
+import { mockLoadSurveyByIdRepository } from '@/tests/data/mocks'
 
 type SutTypes = {
   sut: DbLoadSurveyById
@@ -28,7 +10,7 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const loadSurveyByIdRepositorySpy = makeLoadSurveyByIdRepository()
+  const loadSurveyByIdRepositorySpy = mockLoadSurveyByIdRepository()
   const sut = new DbLoadSurveyById(loadSurveyByIdRepositorySpy)
   return {
     sut,
@@ -60,7 +42,7 @@ describe('DbLoadSurveyById', () => {
   test('Should throw if LoadSurveyByIdRepository throws', async () => {
     const { sut, loadSurveyByIdRepositorySpy } = makeSut()
     jest.spyOn(loadSurveyByIdRepositorySpy, 'loadById')
-      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+      .mockImplementationOnce(throwError)
     const promise = sut.loadById('any_id')
     await expect(promise).rejects.toThrow()
   })
