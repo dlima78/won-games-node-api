@@ -6,7 +6,7 @@ import { ok, serverError } from '@/presentation/helpers/http-helper'
 import { mockAccount } from '@/tests/domain/mocks'
 import { mockLogErrorRepository } from '@/tests/data/mocks'
 
-const makeFakeRequest = (): HttpRequest => {
+const mockRequest = (): HttpRequest => {
   const password = faker.internet.password()
   return {
     body: {
@@ -54,14 +54,14 @@ describe('LogController Decorator', () => {
   test('Should call controller handle ', async () => {
     const { sut, controllerSpy } = makeSut()
     const handleSpy = jest.spyOn(controllerSpy, 'handle')
-    const httpRequest = makeFakeRequest()
+    const httpRequest = mockRequest()
     await sut.handle(httpRequest)
     expect(handleSpy).toHaveBeenCalledWith(httpRequest)
   })
 
   test('Should return the same result of the controller', async () => {
     const { sut } = makeSut()
-    const httpResponse = await sut.handle(makeFakeRequest())
+    const httpResponse = await sut.handle(mockRequest())
     expect(httpResponse).toEqual(ok(mockAccount()))
   })
 
@@ -72,7 +72,7 @@ describe('LogController Decorator', () => {
     jest.spyOn(controllerSpy, 'handle')
       .mockReturnValueOnce(Promise.resolve(makeFakeServerError()))
 
-    await sut.handle(makeFakeRequest())
+    await sut.handle(mockRequest())
     expect(logSpy).toHaveBeenCalledWith('any_stack')
   })
 })
