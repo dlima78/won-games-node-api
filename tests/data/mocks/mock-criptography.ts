@@ -1,38 +1,40 @@
 import { Hasher, HashComparer, Encrypter, Decrypter } from '@/data/protocols'
+import faker from 'faker'
 
-export const mockHasher = (): Hasher => {
-  class HasherSpy implements Hasher {
-    async hash (value: string): Promise<string> {
-      return await Promise.resolve('hashed_password')
-    }
+export class HasherSpy implements Hasher {
+  digest = faker.datatype.uuid()
+  plaintext: string
+  async hash (plaintext: string): Promise<string> {
+    this.plaintext = plaintext
+    return this.digest
   }
-  return new HasherSpy()
 }
 
-export const mockHashComparer = (): HashComparer => {
-  class HashCompareSpy implements HashComparer {
-    async compare (value: string, hash: string): Promise<boolean> {
-      return await Promise.resolve(true)
-    }
+export class HashComparerSpy implements HashComparer {
+  plaintext: string
+  digest: string
+  isValid = true
+  async compare (plaintext: string, digest: string): Promise<boolean> {
+    this.plaintext = plaintext
+    this.digest = digest
+    return this.isValid
   }
-
-  return new HashCompareSpy()
 }
 
-export const mockEncrypter = (): Encrypter => {
-  class EncrypterSpy implements Encrypter {
-    async encrypt (value: string): Promise<string> {
-      return await Promise.resolve('any_token')
-    }
+export class EncrypterSpy implements Encrypter {
+  ciphertext = faker.datatype.uuid()
+  plaintext: string
+  async encrypt (plaintext: string): Promise<string> {
+    this.plaintext = plaintext
+    return await Promise.resolve(this.ciphertext)
   }
-  return new EncrypterSpy()
 }
 
-export const mockDecrypter = (): Decrypter => {
-  class DecrypterSpy implements Decrypter {
-    async decrypt (value: string): Promise<string> {
-      return await Promise.resolve('any-token')
-    }
+export class DecrypterSpy implements Decrypter {
+  plaintext = faker.internet.password()
+  ciphertext: string
+  async decrypt (ciphertext: string): Promise<string> {
+    this.ciphertext = ciphertext
+    return await Promise.resolve(this.plaintext)
   }
-  return new DecrypterSpy()
 }

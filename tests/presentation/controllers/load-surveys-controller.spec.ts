@@ -1,26 +1,16 @@
 import { LoadSurveysController } from '@/presentation/controllers'
 import { noContent, ok, serverError } from '@/presentation/helpers/http-helper'
-import { LoadSurveys } from '@/domain/usecases'
-import { SurveyModel } from '@/domain/models'
-import { mockSurveys, throwError } from '@/tests/domain/mocks'
+import { throwError } from '@/tests/domain/mocks'
 import MockDate from 'mockdate'
-
-const makeLoadSurveys = (): LoadSurveys => {
-  class LoadSurveysSpy implements LoadSurveys {
-    async load (): Promise<SurveyModel[]> {
-      return await Promise.resolve(mockSurveys())
-    }
-  }
-  return new LoadSurveysSpy()
-}
+import { LoadSurveysSpy } from '@/tests/presentation/mocks'
 
 type SutTypes = {
   sut: LoadSurveysController
-  loadSurveysSpy: LoadSurveys
+  loadSurveysSpy: LoadSurveysSpy
 }
 
 const makeSut = (): SutTypes => {
-  const loadSurveysSpy = makeLoadSurveys()
+  const loadSurveysSpy = new LoadSurveysSpy()
   const sut = new LoadSurveysController(loadSurveysSpy)
   return {
     sut,
@@ -38,20 +28,19 @@ describe('LoadSurveys Controller', () => {
   })
   test('Should call LoadSurveys', async () => {
     const { sut, loadSurveysSpy } = makeSut()
-    const loadSpy = jest.spyOn(loadSurveysSpy, 'load')
     await sut.handle({})
-    expect(loadSpy).toHaveBeenCalled()
+    expect(loadSurveysSpy.callsCount).toBe(1)
   })
 
   test('Should return 200 on success', async () => {
-    const { sut } = makeSut()
+    const { sut, loadSurveysSpy } = makeSut()
     const httpResponse = await sut.handle({})
-    expect(httpResponse).toEqual(ok(mockSurveys()))
+    expect(httpResponse).toEqual(ok(loadSurveysSpy.surveyModels))
   })
 
   test('Should return 204 if LoadSurveys returns empty', async () => {
     const { sut, loadSurveysSpy } = makeSut()
-    jest.spyOn(loadSurveysSpy, 'load').mockReturnValueOnce(Promise.resolve([]))
+    loadSurveysSpy.surveyModels = []
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(noContent())
   })

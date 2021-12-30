@@ -1,7 +1,7 @@
 import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
 import { Collection } from 'mongodb'
 import { SurveyMongoRepository } from '@/infra/db/mongodb'
-import { mockSurveyParams } from '@/tests/domain/mocks'
+import { mockAddSurveyParams } from '@/tests/domain/mocks'
 
 const makeSut = (): SurveyMongoRepository => {
   return new SurveyMongoRepository()
@@ -25,7 +25,7 @@ describe('Survey Mongo Repository', () => {
   describe('add()', () => {
     test('Should add survey on success', async () => {
       const sut = makeSut()
-      await sut.add(mockSurveyParams())
+      await sut.add(mockAddSurveyParams())
       const count = await surveyCollection.countDocuments()
       expect(count).toBe(1)
     })
@@ -34,7 +34,7 @@ describe('Survey Mongo Repository', () => {
   describe('load()', () => {
     test('Should loadAll surveys on success', async () => {
       const sut = makeSut()
-      const addSurveyModels = [mockSurveyParams(), mockSurveyParams()]
+      const addSurveyModels = [mockAddSurveyParams(), mockAddSurveyParams()]
       await surveyCollection.insertMany(addSurveyModels)
       const surveys = await sut.loadAll()
       expect(surveys.length).toBe(2)
@@ -52,7 +52,7 @@ describe('Survey Mongo Repository', () => {
 
   describe('loadById()', () => {
     test('Should loadById surveys on success', async () => {
-      const res = await surveyCollection.insertOne(mockSurveyParams())
+      const res = await surveyCollection.insertOne(mockAddSurveyParams())
       const sut = makeSut()
       const survey = await sut.loadById(res.ops[0]._id)
       expect(survey).toBeTruthy()

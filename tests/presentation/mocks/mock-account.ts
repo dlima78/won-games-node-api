@@ -1,30 +1,36 @@
 import { AccountModel } from '@/domain/models'
 import { AddAccount, AddAccountParams, Authentication, AuthenticationParams, LoadAccountByToken } from '@/domain/usecases'
-import { mockAccount } from '@/tests/domain/mocks'
+import { mockAccountModel } from '@/tests/domain/mocks'
+import faker from 'faker'
 
-export const mockAddAccount = (): AddAccount => {
-  class AddAccountSpy implements AddAccount {
-    async add (account: AddAccountParams): Promise<AccountModel> {
-      return await Promise.resolve(mockAccount())
-    }
+export class AddAccountSpy implements AddAccount {
+  accountModel = mockAccountModel()
+  addAccountParams: AddAccountParams
+
+  async add (account: AddAccountParams): Promise<AccountModel> {
+    this.addAccountParams = account
+    return await Promise.resolve(this.accountModel)
   }
-  return new AddAccountSpy()
 }
 
-export const mockAuthentication = (): Authentication => {
-  class AuthenticationSpy implements Authentication {
-    async auth (authentication: AuthenticationParams): Promise<string> {
-      return await Promise.resolve('any_token')
-    }
+export class AuthenticationSpy implements Authentication {
+  authenticationParams: AuthenticationParams
+  token = faker.datatype.uuid()
+
+  async auth (authenticationParams: AuthenticationParams): Promise<string> {
+    this.authenticationParams = authenticationParams
+    return await Promise.resolve(this.token)
   }
-  return new AuthenticationSpy()
 }
 
-export const mockLoadAccountByToken = (): LoadAccountByToken => {
-  class LoadAccountByTokenSpy implements LoadAccountByToken {
-    async load (accessToken: string, role?: string): Promise<AccountModel> {
-      return await Promise.resolve(mockAccount())
-    }
+export class LoadAccountByTokenSpy implements LoadAccountByToken {
+  accountModel = mockAccountModel()
+  accessToken: string
+  role: string
+
+  async load (accessToken: string, role?: string): Promise<AccountModel> {
+    this.accessToken = accessToken
+    this.role = role
+    return await Promise.resolve(this.accountModel)
   }
-  return new LoadAccountByTokenSpy()
 }

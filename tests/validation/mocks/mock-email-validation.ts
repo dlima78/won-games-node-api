@@ -1,10 +1,10 @@
 import { EmailValidator } from '@/presentation/protocols'
 
-export const mockEmailValidator = (): EmailValidator => {
-  class EmailValidatorSpy implements EmailValidator {
-    isValid (email: string): boolean {
-      return true
-    }
+export class EmailValidatorSpy implements EmailValidator {
+  isValidEmail = true
+  email: string
+  isValid (email: string): boolean {
+    this.email = email
+    return this.isValidEmail
   }
-  return new EmailValidatorSpy()
 }

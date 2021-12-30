@@ -1,18 +1,19 @@
 import { InvalidParamError } from '@/presentation/errors'
-import { EmailValidator } from '@/presentation/protocols'
 import { EmailValidation } from '@/validation/validators'
 import faker from 'faker'
 import { throwError } from '@/tests/domain/mocks'
-import { mockEmailValidator } from '@/tests/validation/mocks'
+import { EmailValidatorSpy } from '@/tests/validation/mocks'
+
+const field = faker.random.word()
 
 type SutTypes = {
   sut: EmailValidation
-  emailValidatorSpy: EmailValidator
+  emailValidatorSpy: EmailValidatorSpy
 }
 
 const makeSut = (): SutTypes => {
-  const emailValidatorSpy = mockEmailValidator()
-  const sut = new EmailValidation(emailValidatorSpy, 'email')
+  const emailValidatorSpy = new EmailValidatorSpy()
+  const sut = new EmailValidation(emailValidatorSpy, field)
   return {
     sut,
     emailValidatorSpy
@@ -22,17 +23,17 @@ const makeSut = (): SutTypes => {
 describe('Email Validation', () => {
   test('Should return an error if EmailValidator returns false', () => {
     const { sut, emailValidatorSpy } = makeSut()
-    jest.spyOn(emailValidatorSpy, 'isValid').mockReturnValueOnce(false)
-    const error = sut.validate({ email: faker.internet.email() })
-    expect(error).toEqual(new InvalidParamError('email'))
+    emailValidatorSpy.isValidEmail = false
+    const email = faker.internet.email()
+    const error = sut.validate({ [field]: email })
+    expect(error).toEqual(new InvalidParamError(field))
   })
 
   test('Should call EmailValidator with correct email', () => {
     const { sut, emailValidatorSpy } = makeSut()
-    const isValidSpy = jest.spyOn(emailValidatorSpy, 'isValid')
     const email = faker.internet.email()
-    sut.validate({ email })
-    expect(isValidSpy).toHaveBeenCalledWith(email)
+    sut.validate({ [field]: email })
+    expect(emailValidatorSpy.email).toBe(email)
   })
 
   test('Should throw if EmailValidator throws', () => {
