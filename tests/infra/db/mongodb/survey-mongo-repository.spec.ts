@@ -2,7 +2,6 @@ import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
 import { Collection } from 'mongodb'
 import { SurveyMongoRepository } from '@/infra/db/mongodb'
 import { mockAddAccountParams, mockAddSurveyParams } from '@/tests/domain/mocks'
-import { AccountModel } from '@/domain/models'
 
 const makeSut = (): SurveyMongoRepository => {
   return new SurveyMongoRepository()
@@ -12,9 +11,9 @@ let surveyCollection: Collection
 let accountCollection: Collection
 let surveyResultCollection: Collection
 
-const mockAccountModel = async (): Promise<AccountModel> => {
+const mockAccountId = async (): Promise<string> => {
   const res = await accountCollection.insertOne(mockAddAccountParams())
-  return MongoHelper.map(res.ops[0])
+  return res.ops[0]._id
 }
 
 describe('Survey Mongo Repository', () => {
@@ -46,17 +45,17 @@ describe('Survey Mongo Repository', () => {
   describe('loadAll()', () => {
     test('Should loadAll surveys on success', async () => {
       const sut = makeSut()
-      const account = await mockAccountModel()
+      const accountId = await mockAccountId()
       const addSurveyModels = [mockAddSurveyParams(), mockAddSurveyParams()]
       const result = await surveyCollection.insertMany(addSurveyModels)
       const survey = result.ops[0]
       await surveyResultCollection.insertOne({
         surveyId: survey._id,
-        accountId: account.id,
+        accountId,
         answer: survey.answers[0].answer,
         date: new Date()
       })
-      const surveys = await sut.loadAll(account.id)
+      const surveys = await sut.loadAll(accountId)
       expect(surveys.length).toBe(2)
       expect(surveys[0].id).toBeTruthy()
       expect(surveys[0].question).toBe(addSurveyModels[0].question)
@@ -67,8 +66,8 @@ describe('Survey Mongo Repository', () => {
 
     test('Should load empty list', async () => {
       const sut = makeSut()
-      const account = await mockAccountModel()
-      const surveys = await sut.loadAll(account.id)
+      const accountId = await mockAccountId()
+      const surveys = await sut.loadAll(accountId)
       expect(surveys.length).toBe(0)
     })
   })

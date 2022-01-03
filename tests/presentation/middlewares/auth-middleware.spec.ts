@@ -1,14 +1,11 @@
 import { AccessDeniedError } from '@/presentation/errors'
 import { forbidden, ok, serverError } from '@/presentation/helpers/http-helper'
 import { AuthMiddleware } from '@/presentation/middlewares'
-import { HttpRequest } from '@/presentation/protocols'
 import { throwError } from '@/tests/domain/mocks'
 import { LoadAccountByTokenSpy } from '@/tests/presentation/mocks'
 
-const mockRequest = (): HttpRequest => ({
-  headers: {
-    'x-access-token': 'any_token'
-  }
+const mockRequest = (): AuthMiddleware.Request => ({
+  accessToken: 'any_token'
 })
 
 type SutTypes = {
@@ -28,7 +25,7 @@ const makeSut = (role?: string): SutTypes => {
 describe('Auth Middleware', () => {
   test('Should return 403 if no x-access-token exists in headers', async () => {
     const { sut, loadAccountByTokenSpy } = makeSut()
-    loadAccountByTokenSpy.accountModel = null
+    loadAccountByTokenSpy.result = null
     const httpResponse = await sut.handle(mockRequest())
     expect(httpResponse).toEqual(forbidden(new AccessDeniedError()))
   })
@@ -38,13 +35,13 @@ describe('Auth Middleware', () => {
     const { sut, loadAccountByTokenSpy } = makeSut(role)
     const httpRequest = mockRequest()
     await sut.handle(httpRequest)
-    expect(loadAccountByTokenSpy.accessToken).toBe(httpRequest.headers['x-access-token'])
+    expect(loadAccountByTokenSpy.accessToken).toBe(httpRequest.accessToken)
     expect(loadAccountByTokenSpy.role).toBe(role)
   })
 
   test('Should return 403 if LoadAccountByToken returns null', async () => {
     const { sut, loadAccountByTokenSpy } = makeSut()
-    loadAccountByTokenSpy.accountModel = null
+    loadAccountByTokenSpy.result = null
     const httpResponse = await sut.handle(mockRequest())
     expect(httpResponse).toEqual(forbidden(new AccessDeniedError()))
   })
@@ -53,7 +50,7 @@ describe('Auth Middleware', () => {
     const { sut, loadAccountByTokenSpy } = makeSut()
     const httpResponse = await sut.handle(mockRequest())
     expect(httpResponse).toEqual(ok({
-      accountId: loadAccountByTokenSpy.accountModel.id
+      accountId: loadAccountByTokenSpy.result.id
     }))
   })
 
