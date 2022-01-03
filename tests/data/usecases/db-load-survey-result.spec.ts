@@ -7,17 +7,17 @@ import faker from 'faker'
 type SutTypes = {
   sut: DbLoadSurveyResult
   loadSurveyResultRepositorySpy: LoadSurveyResultRepositorySpy
-  loadSurveyByIdRepository: LoadSurveyByIdRepositorySpy
+  loadSurveyByIdRepositorySpy: LoadSurveyByIdRepositorySpy
 }
 
 const makeSut = (): SutTypes => {
   const loadSurveyResultRepositorySpy = new LoadSurveyResultRepositorySpy()
-  const loadSurveyByIdRepository = new LoadSurveyByIdRepositorySpy()
-  const sut = new DbLoadSurveyResult(loadSurveyResultRepositorySpy, loadSurveyByIdRepository)
+  const loadSurveyByIdRepositorySpy = new LoadSurveyByIdRepositorySpy()
+  const sut = new DbLoadSurveyResult(loadSurveyResultRepositorySpy, loadSurveyByIdRepositorySpy)
   return {
     sut,
     loadSurveyResultRepositorySpy,
-    loadSurveyByIdRepository
+    loadSurveyByIdRepositorySpy
   }
 }
 
@@ -54,22 +54,22 @@ describe('DbLoadSurveyResult', () => {
   })
 
   test('Should call LoadSurveyByIdRepository if LoadSurveyResultRepository returns null', async () => {
-    const { sut, loadSurveyResultRepositorySpy, loadSurveyByIdRepository } = makeSut()
+    const { sut, loadSurveyResultRepositorySpy, loadSurveyByIdRepositorySpy } = makeSut()
     loadSurveyResultRepositorySpy.surveyResultModel = null
     await sut.load(surveyId, accountId)
-    expect(loadSurveyByIdRepository.id).toBe(surveyId)
+    expect(loadSurveyByIdRepositorySpy.id).toBe(surveyId)
   })
 
   test('Should return surveyResultModel with all answers with count 0 if if LoadSurveyResultRepository returns null', async () => {
-    const { sut, loadSurveyResultRepositorySpy, loadSurveyByIdRepository } = makeSut()
+    const { sut, loadSurveyResultRepositorySpy, loadSurveyByIdRepositorySpy } = makeSut()
     loadSurveyResultRepositorySpy.surveyResultModel = null
-    const { surveyModel } = loadSurveyByIdRepository
+    const { result } = loadSurveyByIdRepositorySpy
     const surveyResult = await sut.load(surveyId, accountId)
     expect(surveyResult).toEqual({
-      surveyId: surveyModel.id,
-      question: surveyModel.question,
-      date: surveyModel.date,
-      answers: surveyModel.answers.map(answer => Object.assign({}, answer, {
+      surveyId: result.id,
+      question: result.question,
+      date: result.date,
+      answers: result.answers.map(answer => Object.assign({}, answer, {
         count: 0,
         percent: 0,
         isCurrentAccountAnswer: false
