@@ -1,4 +1,3 @@
-import { SurveyModel } from '@/domain/models'
 import { AddSurveyRepository, LoadSurveyByIdRepository, LoadSurveysRepository, CheckSurveyByIdRepository, LoadAnswersBySurveyRepository } from '@/data/protocols'
 import { mockSurveyModel, mockSurveyModels } from '@/tests/domain/mocks'
 import faker from 'faker'
@@ -12,11 +11,11 @@ export class AddSurveyRepositorySpy implements AddSurveyRepository {
 }
 
 export class LoadSurveysRepositorySpy implements LoadSurveysRepository {
-  surveyModels = mockSurveyModels()
+  result = mockSurveyModels()
   accountId: string
-  async loadAll (accountId: string): Promise<SurveyModel[]> {
+  async loadAll (accountId: string): Promise<LoadSurveysRepository.Result> {
     this.accountId = accountId
-    return await Promise.resolve(this.surveyModels)
+    return await Promise.resolve(this.result)
   }
 }
 
