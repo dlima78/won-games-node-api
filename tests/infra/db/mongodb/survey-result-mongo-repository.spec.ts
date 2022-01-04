@@ -14,12 +14,13 @@ let accountCollection: Collection
 
 const mockSurveyModel = async (): Promise<SurveyModel> => {
   const res = await surveyCollection.insertOne(mockAddSurveyParams())
-  return MongoHelper.map(res.ops[0])
+  const survey = await surveyCollection.findOne({ _id: res.insertedId })
+  return MongoHelper.map(survey)
 }
 
 const mockAccountId = async (): Promise<string> => {
   const res = await accountCollection.insertOne(mockAddAccountParams())
-  return res.ops[0]._id
+  return res.insertedId.toHexString()
 }
 
 describe('SurveyResultMongoRepository', () => {
@@ -31,11 +32,11 @@ describe('SurveyResultMongoRepository', () => {
   })
 
   beforeEach(async () => {
-    surveyCollection = await MongoHelper.getCollection('surveys')
+    surveyCollection = MongoHelper.getCollection('surveys')
     await surveyCollection.deleteMany({})
-    surveyResultCollection = await MongoHelper.getCollection('surveyResults')
+    surveyResultCollection = MongoHelper.getCollection('surveyResults')
     await surveyResultCollection.deleteMany({})
-    accountCollection = await MongoHelper.getCollection('accounts')
+    accountCollection = MongoHelper.getCollection('accounts')
     await accountCollection.deleteMany({})
   })
 
@@ -51,8 +52,8 @@ describe('SurveyResultMongoRepository', () => {
         date: new Date()
       })
       const surveyResult = await surveyResultCollection.findOne({
-        surveyId: survey.id,
-        accountId
+        surveyId: new ObjectId(survey.id),
+        accountId: new ObjectId(accountId)
       })
       expect(surveyResult).toBeTruthy()
     })
@@ -68,15 +69,15 @@ describe('SurveyResultMongoRepository', () => {
       })
       const sut = makeSut()
       await sut.save({
-        surveyId: new ObjectId(survey.id),
-        accountId: new ObjectId(accountId),
+        surveyId: survey.id,
+        accountId: accountId,
         answer: survey.answers[1].answer,
         date: new Date()
       })
 
       const surveyResult = await surveyResultCollection.find({
-        surveyId: survey.id,
-        accountId
+        surveyId: new ObjectId(survey.id),
+        accountId: new ObjectId(accountId)
       }).toArray()
 
       expect(surveyResult).toBeTruthy()

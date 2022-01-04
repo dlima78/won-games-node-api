@@ -1,4 +1,5 @@
 import { AddAccountRepository, LoadAccountByEmailRepository, LoadAccountByTokenRepository, UpdateAccessTokenRepository, CheckAccountByEmailRepository } from '@/data/protocols'
+import { ObjectId } from 'mongodb'
 import { MongoHelper } from './mongo-helper'
 
 export class AccountMongoRepository implements
@@ -8,13 +9,13 @@ export class AccountMongoRepository implements
   UpdateAccessTokenRepository,
   LoadAccountByTokenRepository {
   async add (data: AddAccountRepository.Params): Promise<AddAccountRepository.Result> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
+    const accountCollection = MongoHelper.getCollection('accounts')
     const result = await accountCollection.insertOne(data)
-    return result.ops[0] !== null
+    return result.insertedId !== null
   }
 
   async checkByEmail (email: string): Promise<CheckAccountByEmailRepository.Result> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
+    const accountCollection = MongoHelper.getCollection('accounts')
     const account = await accountCollection.findOne({
       email
     }, {
@@ -26,7 +27,7 @@ export class AccountMongoRepository implements
   }
 
   async loadByEmail (email: string): Promise<LoadAccountByEmailRepository.Result> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
+    const accountCollection = MongoHelper.getCollection('accounts')
     const account = await accountCollection.findOne({
       email
     }, {
@@ -40,8 +41,8 @@ export class AccountMongoRepository implements
   }
 
   async updateAccessToken (id: string, token: string): Promise<void> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
-    await accountCollection.updateOne({ _id: id }, {
+    const accountCollection = MongoHelper.getCollection('accounts')
+    await accountCollection.updateOne({ _id: new ObjectId(id) }, {
       $set: {
         accessToken: token
       }
@@ -50,7 +51,7 @@ export class AccountMongoRepository implements
   }
 
   async loadByToken (token: string, role?: string): Promise<LoadAccountByTokenRepository.Result> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
+    const accountCollection = MongoHelper.getCollection('accounts')
     const account = await accountCollection.findOne({
       accessToken: token,
       $or: [{

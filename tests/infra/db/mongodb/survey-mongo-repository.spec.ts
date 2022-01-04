@@ -1,7 +1,7 @@
 import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
 import { SurveyMongoRepository } from '@/infra/db/mongodb'
 import { mockAddAccountParams, mockAddSurveyParams } from '@/tests/domain/mocks'
-import { Collection, ObjectID } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 
 const makeSut = (): SurveyMongoRepository => {
   return new SurveyMongoRepository()
@@ -13,7 +13,7 @@ let surveyResultCollection: Collection
 
 const mockAccountId = async (): Promise<string> => {
   const res = await accountCollection.insertOne(mockAddAccountParams())
-  return res.ops[0]._id
+  return res.insertedId.toHexString()
 }
 
 describe('Survey Mongo Repository', () => {
@@ -25,11 +25,11 @@ describe('Survey Mongo Repository', () => {
   })
 
   beforeEach(async () => {
-    surveyCollection = await MongoHelper.getCollection('surveys')
+    surveyCollection = MongoHelper.getCollection('surveys')
     await surveyCollection.deleteMany({})
-    accountCollection = await MongoHelper.getCollection('accounts')
+    accountCollection = MongoHelper.getCollection('accounts')
     await accountCollection.deleteMany({})
-    surveyResultCollection = await MongoHelper.getCollection('surveyResults')
+    surveyResultCollection = MongoHelper.getCollection('surveyResults')
     await surveyResultCollection.deleteMany({})
   })
 
@@ -48,10 +48,10 @@ describe('Survey Mongo Repository', () => {
       const accountId = await mockAccountId()
       const addSurveyModels = [mockAddSurveyParams(), mockAddSurveyParams()]
       const result = await surveyCollection.insertMany(addSurveyModels)
-      const survey = result.ops[0]
+      const survey = await surveyCollection.findOne({ _id: result.insertedIds[0] })
       await surveyResultCollection.insertOne({
         surveyId: survey._id,
-        accountId,
+        accountId: new ObjectId(accountId),
         answer: survey.answers[0].answer,
         date: new Date()
       })
@@ -76,15 +76,15 @@ describe('Survey Mongo Repository', () => {
     test('Should loadById surveys on success', async () => {
       const res = await surveyCollection.insertOne(mockAddSurveyParams())
       const sut = makeSut()
-      const survey = await sut.loadById(res.ops[0]._id)
+      const survey = await sut.loadById(res.insertedId.toHexString())
       expect(survey).toBeTruthy()
       expect(survey.id).toBeTruthy()
     })
 
     test('Should return null if surveys does not exists', async () => {
       const sut = makeSut()
-      const objectID = new ObjectID()
-      const survey = await sut.loadById(objectID)
+      const objectId = new ObjectId().toHexString()
+      const survey = await sut.loadById(objectId)
       expect(survey).toBeNull()
     })
   })
@@ -92,16 +92,16 @@ describe('Survey Mongo Repository', () => {
   describe('loadAnswers()', () => {
     test('Should load answers success', async () => {
       const res = await surveyCollection.insertOne(mockAddSurveyParams())
-      const survey = res.ops[0]
+      const survey = await surveyCollection.findOne({ _id: res.insertedId })
       const sut = makeSut()
-      const answers = await sut.loadAnswers(survey._id)
+      const answers = await sut.loadAnswers(survey._id.toHexString())
       expect(answers).toEqual([survey.answers[0].answer, survey.answers[1].answer])
     })
 
     test('Should return empty array if survey not exists', async () => {
       const sut = makeSut()
-      const objectID = new ObjectID()
-      const answers = await sut.loadAnswers(objectID)
+      const objectId = new ObjectId().toHexString()
+      const answers = await sut.loadAnswers(objectId)
       expect(answers).toEqual([])
     })
   })
@@ -110,14 +110,14 @@ describe('Survey Mongo Repository', () => {
     test('Should return true if survey exists', async () => {
       const res = await surveyCollection.insertOne(mockAddSurveyParams())
       const sut = makeSut()
-      const exists = await sut.checkById(res.ops[0]._id)
+      const exists = await sut.checkById(res.insertedId.toHexString())
       expect(exists).toBe(true)
     })
 
     test('Should return false if survey not exists', async () => {
       const sut = makeSut()
-      const objectID = new ObjectID()
-      const exists = await sut.checkById(objectID)
+      const objectId = new ObjectId().toHexString()
+      const exists = await sut.checkById(objectId)
       expect(exists).toBe(false)
     })
   })
